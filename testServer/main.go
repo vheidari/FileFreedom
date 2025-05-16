@@ -1,3 +1,4 @@
+
 package main
 
 
@@ -46,6 +47,12 @@ func videoServer(w http.ResponseWriter, r *http.Request) {
 
 
 func main() {
+
+
+	
+	fmt.Println("Server is runing ...")
+	fmt.Println("Server Ip Adddres = http://" + serverIp)
+	fmt.Println("--------------------------------------------")
 
 	http.HandleFunc("/", videoServer)
 	http.ListenAndServe(serverIp, nil)
