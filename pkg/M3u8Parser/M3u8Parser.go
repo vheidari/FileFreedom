@@ -6,18 +6,12 @@ import "log"
 import "strings"
 import "bufio"
 
-type m3u8Data struct {
-	 encryptionMethod string
-	 encryptionKeyFile string
-	 encryptoinKeyUrl string 
-	 videoFiles []string 
-}
 
 
-func ParseIt(fileDownloader *FileDownloader.FileDownloader, fileName string) error {
+func ParseIt(downloadPath string, fileName string) (*FileDownloader.M3u8Data, error)  {
 
 	// Genearting File Path
-	dirPath := fileDownloader.DownloadPath()
+	dirPath := downloadPath
 	filePath := dirPath + "/" + fileName
 
 
@@ -28,11 +22,12 @@ func ParseIt(fileDownloader *FileDownloader.FileDownloader, fileName string) err
 		log.Fatal(err)
 	}
 
-	// Free Resource When Our Jobs Was Done
+	// Free Resource When Our Jobs is Done
 	defer fileData.Close()
 
 	scanner := bufio.NewScanner(fileData)
-	var nM3u8Data  *m3u8Data
+	var nM3u8Data = FileDownloader.MakeM3u8Data()
+	videoFiles := make([]string, 0)
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -42,11 +37,11 @@ func ParseIt(fileDownloader *FileDownloader.FileDownloader, fileName string) err
 			methodAndKey := strings.Split(line, ",")
 
 			for _, item := range methodAndKey   {
-				if strings.HasPrefix(item , "#EXT-X-KEY:METHOD=") {
-					nM3u8Data = &m3u8Data { encryptionMethod: strings.TrimPrefix(item, "#EXT-X-KEY:METHOD=")}
+				if strings.HasPrefix(item , "#EXT-X-KEY:METHOD=") {					
+					nM3u8Data.SetM3u8EncryptionMethod( strings.TrimPrefix(item, "#EXT-X-KEY:METHOD=") )
 				} else if strings.HasPrefix(item, "URI=") {
 					if nM3u8Data != nil {
-						nM3u8Data.encryptionKeyFile = strings.Trim(strings.TrimPrefix(item, "URI="), "\"")
+						nM3u8Data.SetM3u8EncryptionKey( strings.Trim(strings.TrimPrefix(item, "URI="), "\"") )
 					}
 				}
 				
@@ -54,19 +49,20 @@ func ParseIt(fileDownloader *FileDownloader.FileDownloader, fileName string) err
 				
 		} else if !strings.HasPrefix(line, "#") {
 			// Excract Video Segments
-			nM3u8Data.videoFiles = append(nM3u8Data.videoFiles, line)
+			videoFiles = append(videoFiles, line)
 		}
 
 	}
 	
 	// Handling error
 	if err := scanner.Err(); err != nil {
-		return err;
+		return nil, err;
 	}
 
+	// Set Video Files 
+	nM3u8Data.SetM3u8VideoFiles(&videoFiles)
 
-	
-	return nil
+	return nM3u8Data, nil
 }
 
 
