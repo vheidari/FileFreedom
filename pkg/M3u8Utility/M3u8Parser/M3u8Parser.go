@@ -1,6 +1,6 @@
 package M3u8Parser
 
-import "vheidari/FileFreedom/pkg/FileDownloader"
+import "vheidari/FileFreedom/pkg/M3u8Utility/M3u8Data"
 import "os"
 import "log"
 import "strings"
@@ -8,7 +8,7 @@ import "bufio"
 
 
 
-func ParseIt(downloadPath string, fileName string) (*FileDownloader.M3u8Data, error)  {
+func ParseIt(downloadPath string, fileName string) (*M3u8Data.M3u8Data, error)  {
 
 	// Genearting File Path
 	dirPath := downloadPath
@@ -26,7 +26,7 @@ func ParseIt(downloadPath string, fileName string) (*FileDownloader.M3u8Data, er
 	defer fileData.Close()
 
 	scanner := bufio.NewScanner(fileData)
-	var nM3u8Data = FileDownloader.MakeM3u8Data()
+	var nM3u8Data = M3u8Data.MakeM3u8Data()
 	videoFiles := make([]string, 0)
 
 	for scanner.Scan() {

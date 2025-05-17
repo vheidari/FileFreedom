@@ -5,20 +5,13 @@ import ("net/http"
  	"io"
  	"os"
  	"vheidari/FileFreedom/pkg/DownloadPath"
+ 	"vheidari/FileFreedom/pkg/M3u8Utility/M3u8Data"
  )
 
 type M3u8FileUrl struct {
-	url string
-		
+	url string		
 }
 
-
-type M3u8Data struct {
-	 encryptionMethod string
-	 encryptionKeyFile string
-	 encryptionKeyUrl string 
-	 videoFiles []string 
-}
 
 
 type FileDownloader  struct {
@@ -26,7 +19,6 @@ type FileDownloader  struct {
  	m3u8Data *M3u8Data
  	downloadPath string
 }
-
 
 func GenerateFileDownloader(m3u8Url string) FileDownloader {
 
@@ -94,76 +86,10 @@ func (url *FileDownloader) downloadM3u8File () {
 
 
 
-
-
 func (fileDownloader *FileDownloader) DownloadPath() string {
 	return fileDownloader.downloadPath
 }
 
-
-
-// M3u8 Manipulator Functions 
-
-func MakeM3u8Data() *M3u8Data {
-
-	var nM3u8Data M3u8Data =  M3u8Data {
-		encryptionMethod : "",
-		encryptionKeyFile : "",
-		encryptionKeyUrl: "",
-		videoFiles : make([]string, 0),
-	}
-
-	return &nM3u8Data
-}
-
-func (m3u8Data  *M3u8Data) SetM3u8EncryptionMethod(method string) {
-		m3u8Data.encryptionMethod = method
-}
-
-
-func (m3u8Data  *M3u8Data) GetM3u8EncryptionMethod() string {
-		return m3u8Data.encryptionMethod
-}
-
-
-func (m3u8Data  *M3u8Data) SetM3u8EncryptionKey(key string) {
-	m3u8Data.encryptionKeyFile = key
-}
-
-
-func (m3u8Data  *M3u8Data) GetM3u8EncryptionKey() string {
-	return m3u8Data.encryptionKeyFile
-}
-
-
-func (m3u8Data  *M3u8Data) SetM3u8VideoFiles(videoFiles *[]string) {
-	m3u8Data.videoFiles = *videoFiles
-}
-
-
-func (m3u8Data  *M3u8Data) GetM3u8VideoFiles() *[]string {
-	return &m3u8Data.videoFiles 
-}
-
-
-func (m3u8Data  *M3u8Data) SetM3u8EncryptionKeyUrl(url string) {
-	m3u8Data.encryptionKeyUrl = url
-}
-
-
-func (m3u8Data  *M3u8Data) GetM3u8EncryptionKeyUrl() string {
-	return m3u8Data.encryptionKeyUrl
-}
-
-
-func (m3u8Data  *M3u8Data) SetM3u8Data(nM3u8Data *M3u8Data) {
-	m3u8Data = nM3u8Data
-}
-
-
-func (m3u8Data  *M3u8Data) GetM3u8Data() *M3u8Data {
-	return	m3u8Data
-}
 
 
 func (url *M3u8FileUrl) DownloadIt () {
