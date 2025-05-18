@@ -24,20 +24,20 @@ type FileDownloader  struct {
 
 func GenerateFileDownloader(m3u8Url string) (*FileDownloader, error) {
 
-	// Is Imput Arggument An Empty String
+	// Check if the input argument m3u8Url is an empty string.
 	if m3u8Url == "" {
 	 	return nil ,errors.New("m3u8Url cant be empty")
 	}
 
- 	 // Make A M3u8FileUrl Instance
+ 	// Create a new instance of M3u8FileUrl with the specified URL.
 	nM3u8FileUrl := M3u8FileUrl {
 	 	url: m3u8Url,
 	}
 
-	// Make An Instance of the M3u8Data 
+	// Create a new instance of M3u8Data.
 	nM3u8Data := M3u8Data.MakeM3u8Data()
 
-	// Geting Download Path
+	// Retrieve the download path from the DownloadPath instance.
 	nDownloadPath  := DownloadPath.DownloadPath()
 	 
 	nFileDownloader := &FileDownloader {
@@ -50,26 +50,26 @@ func GenerateFileDownloader(m3u8Url string) (*FileDownloader, error) {
 }
 
 
-
+// downloadM3u8File download `.m3u8` file with the specified `m3u8FileUrl.url` in the FileDownloader struct.
 func (url *FileDownloader) downloadM3u8File () {
 
 	if url.m3u8FileUrl.url == "" {
 		 log.Fatal("M3u8FileUrl.url : can't be empty")
 	}
 
-	// Creating Download Path
+	// Creates the download path directory (if it does not exist) and returns the full download path for a .m3u8 file.
 	getDownloadPath := url.downloadPath
 	m3u8FileName :=  "master.m3u8"
-	downloadPath := getDownloadPath + "/" + m3u8FileName
+	fullDownloadPath := DownloadPath.CreateDownloadPath(getDownloadPath, m3u8FileName)
 
-	// Get file from m3u8 file from Service
-	res, err := http.Get(url.m3u8FileUrl.url)
+	// Download `.m3u8` file from specified video URL 
+	res, err := http.Get(url.m3u8FileUrl.url) // Send a GET request to download the `.m3u8` file
 
 	if err != nil {
-		 log.Fatal("")		
+		 log.Fatal("Faild to download .m3u8 file: %v", err)		
 	}
 
-	// Read Body Content
+	// Read the body content from the response and stores it in the `body` variable
 	body, err := io.ReadAll(res.Body)
 	res.Body.Close()
 
@@ -79,8 +79,8 @@ func (url *FileDownloader) downloadM3u8File () {
 	}
 
 
-	// Write file body on disk
-	createFile, err := os.Create(downloadPath)
+	// Creates a new file on disk at the specified path
+	createFile, err := os.Create(fullDownloadPath)
 
 	if err != nil {
 		 log.Fatalf("Problem to create %s file on the Disk : %s", m3u8FileName,  err)
@@ -91,24 +91,25 @@ func (url *FileDownloader) downloadM3u8File () {
 }
 
 
-
+// DownloadPath returns the download path as a string associated with the FileDownloader.
 func (fileDownloader *FileDownloader) DownloadPath() string {
 	return fileDownloader.downloadPath
 }
 
 
 
-func (url *M3u8FileUrl) DownloadIt () {
-
-		
+func (url *M3u8FileUrl) DownloadKeyAndVideoFiles () {
+	
 }
 
-
+// GetM3u8FileUrl returns a pointer to the current M3u8FileUrl associated with the FileDownloader.
 func (fileDownloader *FileDownloader) GetM3u8FileUrl() *M3u8FileUrl {
 	return &fileDownloader.m3u8FileUrl
 }
 
 
+
+// GateBaseUrl takes a name of the m3u8file and returns a Baseurl as string    
 func (url *M3u8FileUrl) GetBaseUrl(m3u8FileName string) string {
 	var found bool
 	var before string
