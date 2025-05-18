@@ -4,6 +4,8 @@ import ("net/http"
  	"log"
  	"io"
  	"os"
+ 	"errors"
+ 	"strings"
  	"vheidari/FileFreedom/pkg/DownloadPath"
  	"vheidari/FileFreedom/pkg/M3u8Utility/M3u8Data"
  )
@@ -16,31 +18,35 @@ type M3u8FileUrl struct {
 
 type FileDownloader  struct {
  	m3u8FileUrl M3u8FileUrl
- 	m3u8Data *M3u8Data
+ 	m3u8Data *M3u8Data.M3u8Data
  	downloadPath string
 }
 
-func GenerateFileDownloader(m3u8Url string) FileDownloader {
+func GenerateFileDownloader(m3u8Url string) (*FileDownloader, error) {
 
-	// check input arrgument that can't be a empty url
+	// Is Imput Arggument An Empty String
 	if m3u8Url == "" {
-	 	log.Fatal("m3u8Url cant be empty") 	
+	 	return nil ,errors.New("m3u8Url cant be empty")
 	}
 
-
- 	 // generate a M3u8FileUrl object
+ 	 // Make A M3u8FileUrl Instance
 	nM3u8FileUrl := M3u8FileUrl {
 	 	url: m3u8Url,
 	}
 
+	// Make An Instance of the M3u8Data 
+	nM3u8Data := M3u8Data.MakeM3u8Data()
+
+	// Geting Download Path
 	nDownloadPath  := DownloadPath.DownloadPath()
 	 
-	nFileDownloader := FileDownloader {
+	nFileDownloader := &FileDownloader {
 		m3u8FileUrl : nM3u8FileUrl,
+		m3u8Data: nM3u8Data,
 		downloadPath: nDownloadPath,
 	}
 
-	return nFileDownloader
+	return nFileDownloader, nil
 }
 
 
@@ -94,5 +100,24 @@ func (fileDownloader *FileDownloader) DownloadPath() string {
 
 func (url *M3u8FileUrl) DownloadIt () {
 
+		
+}
+
+
+func (fileDownloader *FileDownloader) GetM3u8FileUrl() *M3u8FileUrl {
+	return &fileDownloader.m3u8FileUrl
+}
+
+
+func (url *M3u8FileUrl) GetBaseUrl(m3u8FileName string) string {
+	var found bool
+	var before string
+	if strings.HasSuffix(url.url, m3u8FileName ) {
+		before, found = strings.CutSuffix(string(url.url), m3u8FileName)
+		if found {
+			return before
+		} 
+	}
+	return before
 		
 }
